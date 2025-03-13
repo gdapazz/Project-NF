@@ -28,14 +28,18 @@ class NoticiaSeguraApp(App):
     pos_hint= {'center_x': 0.5, 'y': 0.5}  
 )
 
-        self.texto_intro = """Vivemos em uma era em que as informações circulam com uma velocidade impressionante. 
+        self.texto_intro = """
+        
+        Vivemos em uma era em que as informações circulam com uma velocidade impressionante. 
         No entanto, nem todas as notícias que recebemos são verdadeiras. Para combater a desinformação, 
-        criamos o Notícia Segura, um aplicativo desenvolvido especialmente para ajudá-lo a identificar fontes confiáveis, 
+        criamos o Notícia Segura, um aplicativo amigável à idosos desenvolvido especialmente para ajudá-lo a identificar fontes confiáveis, 
         verificar a veracidade das informações e evitar cair em fake news. 
         Utilizando dados de fontes seguras e verificadas, o Notícia Segura é seu aliado 
         na busca por uma informação precisa e confiável..
 
-A informação correta é um direito de todos."""
+A informação correta é um direito de todos.
+
+"""
 
         self.texto_label = Label(
             text=self.texto_intro,
@@ -103,7 +107,10 @@ A informação correta é um direito de todos."""
 
         texto_dicas = """
         
+
         
+
+
         Fake news são formas de desinformação estrategicamente disseminadas que ganharam impulso graças à internet.
         Com a revolução digital, houve um grande aumento da disseminação de notícias falsas (fake news). Para que esses conteúdos atinjam grande público, são usados algoritmos que aumentam seu alcance e repercussão. Além disso, as notícias falsas são compartilhadas com e por pessoas que já acreditam em determinadas ideias, o que torna ainda maior a chance de produzirem posicionamentos radicais entre as pessoas.
         
@@ -128,11 +135,12 @@ Fonte:   https://www.tre-pr.jus.br/comunicacao/noticias/2023/Setembro/como-ident
 
 
 
+
 """
 
         texto_label = Label(
             text=texto_dicas,
-            font_size=28,
+            font_size=24,
             size_hint_y=None,
             height=1000,
             halign="center",
@@ -152,7 +160,11 @@ Fonte:   https://www.tre-pr.jus.br/comunicacao/noticias/2023/Setembro/como-ident
     def mostrar_proxima_pagina(self, instance):
         self.layout.clear_widgets()
         
-        texto_conhecimento = """Agora é hora de colocar seu conhecimento à prova! 
+        texto_conhecimento = """
+        
+        
+        
+        Agora é hora de colocar seu conhecimento à prova! 
         Leia atentamente a notícia e descubra o motivo pelo qual ela é falsa. 
         Preste atenção aos detalhes para identificar os sinais de desinformação. 
         Vamos testar sua habilidade em reconhecer informações confiáveis!
@@ -233,6 +245,25 @@ Fonte:   https://www.tre-pr.jus.br/comunicacao/noticias/2023/Setembro/como-ident
             self.acertos += 1
         self.rodadas += 1
         self.mostrar_noticia()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.nome = ""  
+        self.idade = ""  
+
+    def salvar_dados(self, instance):
+        self.nome = self.nome_input.text.strip()  
+        self.idade = self.idade_input.text.strip()  
+
+        print(f"Nome: {self.nome}, Idade: {self.idade}")
+
+        self.layout.clear_widgets()
+        confirmacao_label = Label(text=f"Bem-vindo, {self.nome}! Estamos prontos para começar.", font_size=28)
+        botao_seguir = Button(text="Seguir", size_hint=(None, None), size=(200, 50))
+        botao_seguir.bind(on_press=self.mostrar_dicas)
+
+        self.layout.add_widget(confirmacao_label)
+        self.layout.add_widget(botao_seguir)
+
     def mostrar_ranking(self, instance):
         self.layout.clear_widgets()
 
@@ -247,6 +278,37 @@ Fonte:   https://www.tre-pr.jus.br/comunicacao/noticias/2023/Setembro/como-ident
 
         ranking_conteudo = Label(text=ranking_texto, font_size=18)
         self.layout.add_widget(ranking_conteudo)
+
+        if self.nome:  
+            botao_excluir = Button(text="Excluir meu cadastro", size_hint=(None, None), size=(200, 50))
+            botao_excluir.bind(on_press=self.excluir_cadastro)
+            self.layout.add_widget(botao_excluir)
+
+    def excluir_cadastro(self, instance):
+        if not self.nome:  
+            return
+
+        try:
+            with open("Ranking.txt", "r") as file:
+                linhas = file.readlines()
+
+            with open("Ranking.txt", "w") as file:
+                for linha in linhas:
+                    if f"Nome: {self.nome}." not in linha:
+                        file.write(linha)
+
+            self.layout.clear_widgets()
+            confirmacao_label = Label(text="Seu cadastro foi excluído do ranking.", font_size=24)
+            botao_voltar = Button(text="Voltar", size_hint=(None, None), size=(200, 50))
+            botao_voltar.bind(on_press=self.mostrar_ranking)
+
+            self.layout.add_widget(confirmacao_label)
+            self.layout.add_widget(botao_voltar)
+
+        except FileNotFoundError:
+            self.layout.clear_widgets()
+            erro_label = Label(text="Erro: O arquivo de ranking não foi encontrado.", font_size=24)
+            self.layout.add_widget(erro_label)
 
 
     
